@@ -22,7 +22,7 @@ import java.util.Date;
 
 @Entity
 @Builder
-@Table(name = "users")
+@Table(name = "user")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
