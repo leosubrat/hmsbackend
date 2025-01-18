@@ -2,6 +2,6 @@ package com.hospitalityhub.service;
 
 import com.hospitalityhub.dto.PatientAppointmentDTO;
 
-public interface UserAppointmentService {
+public interface PatientAppointmentService {
     void saveUserAppointment(PatientAppointmentDTO patientAppointmentDTO);
 }

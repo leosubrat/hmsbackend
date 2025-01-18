@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserAppointmentServiceImpl implements UserAppointmentService {
+public class PatientAppointmentServiceImpl implements PatientAppointmentService {
     private final PatientAppointmentRepository patientAppointmentRepository;
     private final ObjectMapper objectMapper;
     public void saveUserAppointment(PatientAppointmentDTO patientAppointmentDTO){
