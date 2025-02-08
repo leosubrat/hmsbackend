@@ -48,6 +48,7 @@ public class JwtServiceImpl implements JwtService {
   @Override
   public List<String> generateToken(UserDetails userDetails) {
     CustomUserDetails user = (CustomUserDetails) userDetails;
+    System.out.println("what the hell"+user.getRole());
     return List.of(Jwts.builder()
             .setSubject(userDetails.getUsername())
             .claim("role", user.getRole())

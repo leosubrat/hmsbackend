@@ -7,9 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,6 +29,7 @@ public  class CustomUserDetails implements UserDetails {
         this.role=role;
         this.email=email;
         this.password=password;
+        this.authorities = List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override

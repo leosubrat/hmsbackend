@@ -33,7 +33,8 @@ public class UserDetailService implements UserDetailsService {
         if (user.isEmpty()) {
             throw new UserNotFoundException(ResponseMessageConstant.USER_NOT_FOUND);
         }
-        return new CustomUserDetails(user.get().getEmail(), user.get().getPassword(), user.get().getRole());
+        String roleWithPrefix = "ROLE_" + user.get().getRole();
+        return new CustomUserDetails(user.get().getEmail(), user.get().getPassword(), roleWithPrefix);
     }
 
 }

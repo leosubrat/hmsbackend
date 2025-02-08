@@ -26,7 +26,7 @@ public class UserBootStrapData implements CommandLineRunner {
             admin.setFirstName("Admin");
             admin.setEmail("admin@example.com");
             admin.setPassword(passwordEncoder.encode("Admin123@@@"));
-            admin.setRole(Role.valueOf("ADMIN"));
+            admin.setRole(Role.ADMIN);
             userRepository.save(admin);
             System.out.println("Admin user created: " + admin.getEmail());
         } else {

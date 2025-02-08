@@ -1,9 +1,10 @@
-package com.hospitalityhub.service;
+package com.hospitalityhub.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hospitalityhub.dto.PatientAppointmentDTO;
 import com.hospitalityhub.entity.PatientAppointment;
 import com.hospitalityhub.repository.PatientAppointmentRepository;
+import com.hospitalityhub.service.PatientAppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

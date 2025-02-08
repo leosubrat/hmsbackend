@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,7 +30,7 @@ public class AuthenticationController {
     return authenticationService.signup(request);
   }
 
-  @PostMapping(value = ApiURL.USER_SIGN_IN, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = ApiURL.USER_SIGN_IN)
   public JwtResponse signin(@RequestBody SigninRequest request) {
     return authenticationService.signin(request);
   }

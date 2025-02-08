@@ -1,18 +1,22 @@
-package com.hospitalityhub.service;
+package com.hospitalityhub.service.impl;
 
 
 import com.hospitalityhub.config.JwtService;
 import com.hospitalityhub.config.UserDetailService;
 import com.hospitalityhub.dto.SignUpRequest;
 import com.hospitalityhub.dto.SigninRequest;
+import com.hospitalityhub.entity.Doctor;
 import com.hospitalityhub.entity.Role;
 import com.hospitalityhub.entity.User;
 import com.hospitalityhub.exception.InvalidUserCredentialException;
 import com.hospitalityhub.exception.UserAlreadyExistException;
+import com.hospitalityhub.repository.DoctorRepository;
 import com.hospitalityhub.repository.UserRepository;
+import com.hospitalityhub.service.AuthenticationService;
 import com.hospitalityhub.shared.ApiResponse;
 import com.hospitalityhub.shared.JwtResponse;
 import com.hospitalityhub.shared.ResponseMessageConstant;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final PasswordEncoder passwordEncoders;
   private final JwtService jwtService;
   private final UserDetailService userService;
-
+  private final DoctorRepository doctorRepository;
   /**
    * Registers a new user with the provided details.
    *
@@ -46,17 +50,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
    * @author Subrat Thapa
    */
   @Override
+  @Transactional
   public ApiResponse signup(SignUpRequest request) {
     Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
     if (userOptional.isPresent()) {
       throw new UserAlreadyExistException(ResponseMessageConstant.ALREADY_REGISTER);
+    }
+    Role roles = null;
+    if (request.getRole().equals("DOCTOR")){
+      roles=Role.DOCTOR;
+    } else if (request.getRole().equals("USER")) {
+      roles=Role.USER;
     }
     var user = User.builder()
             .firstName(request.getFirstName())
             .lastName(request.getLastName())
             .email(request.getEmail())
             .password(passwordEncoders.encode(request.getPassword()))
-            .role(Role.USER)
+            .role(roles)
             .build();
     userRepository.save(user);
     return new ApiResponse(ResponseMessageConstant.SUCCESSFULLY_SAVE);
