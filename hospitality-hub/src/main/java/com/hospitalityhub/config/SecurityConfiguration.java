@@ -32,6 +32,10 @@ public class SecurityConfiguration {
     http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(request -> request
                     .requestMatchers("/api/user/signin").permitAll()
+                    .requestMatchers("/**","/email").permitAll()
+                    .requestMatchers("/api/admin/signup").hasAuthority(Role.SUPER_ADMIN.name())
+                    .requestMatchers("/add_book").hasAnyRole(Role.ADMIN.name())
+                    .requestMatchers("/add_book").hasAuthority(Role.USER.name())
                     .requestMatchers("/api/user/signup").permitAll()
                     .requestMatchers("/signin", "/signup").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()

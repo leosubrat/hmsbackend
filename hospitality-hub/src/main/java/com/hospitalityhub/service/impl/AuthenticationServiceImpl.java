@@ -84,6 +84,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     return new JwtResponse(stringList.get(0), stringList.get(1), ResponseMessageConstant.SUCCESSFULLY_LOGIN);
   }
 
+  public String forgetPassword(String email) {
+    Optional<User> userOptional = userRepository.findByEmail(email);
+    if (userOptional.isPresent()) {
+      User user = userOptional.get();
+      user.setPassword(passwordEncoders.encode(user.getPassword()));
+      return "user is save succesfully";
+    }
+    return "user is not found";
+  }
 
+  
 
 }
