@@ -2,6 +2,7 @@ package com.hospitalityhub.controllers;
 
 import com.hospitalityhub.dto.DoctorDto;
 import com.hospitalityhub.service.impl.DoctorServiceImpl;
+import com.hospitalityhub.shared.ApiURL;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,13 +13,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/doctor")
 public class DoctorController {
     private final DoctorServiceImpl doctorService;
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/doctor/list")
-    public ResponseEntity<List<DoctorDto>> findAllDoctor(Authentication authenticationRequest){
-        return ResponseEntity.ok(doctorService.findAllDoctor(authenticationRequest));
+//    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(ApiURL.DOCTOR_LIST)
+    public ResponseEntity<List<DoctorDto>> findAllDoctor(){
+        return ResponseEntity.ok(doctorService.findAllDoctor());
     }
     @PutMapping("/update/doctor")
     public void updateDoctor(Authentication authentication,@RequestBody DoctorDto doctorDto){

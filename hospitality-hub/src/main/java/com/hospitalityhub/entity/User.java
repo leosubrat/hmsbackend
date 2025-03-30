@@ -25,6 +25,7 @@ public class User extends BaseEntity {
     private String email;
     private String password;
     private String forgetPasswordCode;
+    private String phone;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date forgetPasswordCodeTimestamp;

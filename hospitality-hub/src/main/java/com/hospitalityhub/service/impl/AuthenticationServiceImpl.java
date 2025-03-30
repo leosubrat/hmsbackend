@@ -56,20 +56,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     if (userOptional.isPresent()) {
       throw new UserAlreadyExistException(ResponseMessageConstant.ALREADY_REGISTER);
     }
-    Role roles = null;
-    if (request.getRole().equals("DOCTOR")){
-      roles=Role.DOCTOR;
+
+    Role role = null;
+    if (request.getRole().equals("DOCTOR")) {
+      role = Role.DOCTOR;
     } else if (request.getRole().equals("USER")) {
-      roles=Role.USER;
+      role = Role.USER;
     }
-    var user = User.builder()
+
+    User user = User.builder()
             .firstName(request.getFirstName())
             .lastName(request.getLastName())
             .email(request.getEmail())
+            .phone(request.getPhone())
             .password(passwordEncoders.encode(request.getPassword()))
-            .role(roles)
+            .role(role)
             .build();
-    userRepository.save(user);
+    User savedUser = userRepository.save(user);
+    if (role == Role.DOCTOR) {
+      Doctor doctor = Doctor.builder()
+              .user(savedUser)
+              .specialization(request.getSpecialization())
+              .licenseNumber(request.getLicenseNumber())
+              .yearsOfExperience(request.getYearsOfExperience())
+              .build();
+      doctorRepository.save(doctor);
+    }
     return new ApiResponse(ResponseMessageConstant.SUCCESSFULLY_SAVE);
   }
 

@@ -28,14 +28,17 @@ public class DoctorServiceImpl {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
 
-    public List<DoctorDto> findAllDoctor(Authentication authentication) {
+    public List<DoctorDto> findAllDoctor() {
         List<Doctor> doctorList = doctorRepository.findAll();
         List<DoctorDto> doctorDtoList = new ArrayList<>();
         for (Doctor doctor : doctorList) {
-            DoctorDto doctorDto = objectMapper.convertValue(doctor, DoctorDto.class);
+            DoctorDto doctorDto = new DoctorDto();
+            doctorDto.setFirstName(doctor.getUser().getFirstName());
+            doctorDto.setLastName(doctor.getUser().getLastName());
+            doctorDto.setExperience(doctor.getYearsOfExperience());
+            doctorDto.setExpertise(doctor.getSpecialization());
             doctorDtoList.add(doctorDto);
         }
-        String principal = authentication.getName();
         return doctorDtoList;
     }
 
