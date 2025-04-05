@@ -20,6 +20,11 @@ public class Doctor {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+    private String doctorDescription;
+    private String expertise;
+    private String salary;
+   private byte[] photo;
+
 }
 //rimesh1@gmail.com
 //Rimesh1@@

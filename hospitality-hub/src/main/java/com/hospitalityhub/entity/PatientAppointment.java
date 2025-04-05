@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 @Entity
 @Table(name = "patient-appointments")
@@ -15,22 +16,23 @@ public class PatientAppointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "doctor_id")
+    private Doctor doctor;
+
+    private LocalDateTime dateTime;
+
+    private String status; // SCHEDULED, COMPLETED, CANCELED
+
+    private String reason;
     private String name;
-
-    @Column(name = "contact", nullable = false, length = 10)
     private String contact;
-
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
-
-    @Column(name = "time", nullable = false)
-    private LocalTime time;
-
-    @Column(name = "type", nullable = false)
+    private String date;
+    private String time;
     private String type;
-
-    @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
-
 }
