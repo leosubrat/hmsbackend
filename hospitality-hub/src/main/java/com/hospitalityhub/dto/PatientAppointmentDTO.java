@@ -1,38 +1,46 @@
 package com.hospitalityhub.dto;
 
-import com.hospitalityhub.entity.PatientAppointment;
-import lombok.*;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Getter
 @Setter
-@ToString
 public class PatientAppointmentDTO {
-    private Long id;
-    private String name;
-    private String contact;
-    private String date;
-    private String time;
-    private String type;
-    private String notes;
-    private String status;
-    private String reason;
-    private Integer doctorId;
+
+    private String patientName;
+    private String patientEmail;
+    private String patientPhone;
+    private String appointmentDate; // String format for easier JSON serialization/deserialization
+    private String appointmentTime;
+    private String reasonForVisit;
+    private String insurance;
+    private boolean isNewPatient;
+    private Long doctorId;
     private String doctorName;
-    private String specialization;
-    private LocalDateTime dateTime;
-    public static PatientAppointment mapToPatientAppointment(PatientAppointmentDTO patientAppointmentDTO){
-        PatientAppointment patientAppointment = new PatientAppointment();
-        patientAppointment.setContact(patientAppointmentDTO.getContact());
-        patientAppointment.setDate(patientAppointmentDTO.getDate());
-        patientAppointment.setTime(patientAppointmentDTO.getTime());
-        patientAppointment.setContact(patientAppointmentDTO.getContact());
-        patientAppointment.setNotes(patientAppointmentDTO.getNotes());
-        patientAppointment.setType(patientAppointmentDTO.getType());
-        return patientAppointment;
+    private String doctorSpecialty;
+
+    // Default constructor
+    public PatientAppointmentDTO() {
+    }
+
+    public PatientAppointmentDTO(String patientName, String patientEmail, String patientPhone,
+                                 String appointmentDate, String appointmentTime, String reasonForVisit,
+                                 String insurance, boolean isNewPatient, Long doctorId,
+                                 String doctorName, String doctorSpecialty) {
+        this.patientName = patientName;
+        this.patientEmail = patientEmail;
+        this.patientPhone = patientPhone;
+        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentTime;
+        this.reasonForVisit = reasonForVisit;
+        this.insurance = insurance;
+        this.isNewPatient = isNewPatient;
+        this.doctorId = doctorId;
+        this.doctorName = doctorName;
+        this.doctorSpecialty = doctorSpecialty;
     }
 
 }

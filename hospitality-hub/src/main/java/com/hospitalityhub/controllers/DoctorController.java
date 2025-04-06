@@ -29,11 +29,6 @@ public class DoctorController {
         return ResponseEntity.ok(doctorService.findAllDoctor());
     }
 
-//    @PutMapping(ApiURL.DOCTOR_UPDATE)
-//    public void updateDoctor(Authentication authentication, @RequestBody DoctorDto doctorDto) {
-//        doctorService.updateDoctor(authentication, doctorDto);
-//    }
-
     @PutMapping(DOCTOR_UPDATE)
     public ResponseEntity<DoctorDto> updateDoctorProfile(@RequestBody DoctorDto doctorDto, Principal principal) {
         String username = principal.getName();

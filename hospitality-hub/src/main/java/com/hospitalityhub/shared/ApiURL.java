@@ -11,4 +11,5 @@ public class ApiURL {
     public final static String DOCTOR_UPDATE=BASE_URL+"/doctor/update";
     public final static  String PROFILE_UPDATE_WITH_PHOTO=BASE_URL+"/doctor/profile/with-photos";
     public final static String UPDATE_DOCTOR_PROFILE=BASE_URL+"/profile";
+    public final static String SAVE_PATIENT_APPOINTMENT=BASE_URL+"/save/patient-appointment";
 }

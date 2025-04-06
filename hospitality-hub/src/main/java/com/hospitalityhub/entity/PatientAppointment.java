@@ -1,38 +1,48 @@
 package com.hospitalityhub.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+
 @Entity
-@Table(name = "patient-appointments")
-@Getter
-@Setter
+@Table(name = "patient_appointments")
 public class PatientAppointment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "patient_name", nullable = false)
+    private String patientName;
 
-    @ManyToOne
-    @JoinColumn(name = "doctor_id")
-    private Doctor doctor;
+    @Column(name = "patient_email", nullable = false)
+    private String patientEmail;
 
-    private LocalDateTime dateTime;
+    @Column(name = "patient_phone", nullable = false)
+    private String patientPhone;
 
-    private String status; // SCHEDULED, COMPLETED, CANCELED
+    @Column(name = "appointment_date")
+    private String appointmentDate;
 
-    private String reason;
-    private String name;
-    private String contact;
-    private String date;
-    private String time;
-    private String type;
-    private String notes;
+    @Column(name = "appointment_time", nullable = false)
+    private String appointmentTime;
+
+    @Column(name = "reason_for_visit", nullable = false, columnDefinition = "TEXT")
+    private String reasonForVisit;
+
+    @Column(name = "insurance")
+    private String insurance;
+
+    @Column(name = "is_new_patient")
+    private boolean isNewPatient;
+
+    @Column(name = "doctor_id", nullable = false)
+    private Long doctorId;
+
+    @Column(name = "doctor_name", nullable = false)
+    private String doctorName;
+
+    @Column(name = "doctor_specialty", nullable = false)
+    private String doctorSpecialty;
+
 }

@@ -16,6 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,5 +25,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PatientAppointmentServiceImpl {
+public class PatientAppointmentServiceImpl implements PatientAppointmentService{
+private final ObjectMapper objectMapper;
+private final PatientAppointmentRepository patientAppointmentRepository;
+    @Override
+    public void savePatientAppointment(PatientAppointmentDTO patientAppointmentDTO) {
+        if (patientAppointmentDTO==null){
+            throw new NotFoundException("patientAppointment is not found");
+        }
+        PatientAppointment patientAppointment = objectMapper.convertValue(patientAppointmentDTO, PatientAppointment.class);
+        patientAppointmentRepository.save(patientAppointment);
+
+    }
 }
