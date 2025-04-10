@@ -23,4 +23,5 @@ public class AppointmentDto {
     private String specialization;
     private String date;
     private String time;
+    private String licenseNumber;
 }

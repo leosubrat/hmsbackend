@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+import java.util.Map;
+
 import static com.hospitalityhub.shared.ApiURL.SAVE_PATIENT_APPOINTMENT;
 
 @RestController
@@ -15,9 +18,9 @@ import static com.hospitalityhub.shared.ApiURL.SAVE_PATIENT_APPOINTMENT;
 public class PatientAppointmentController {
   private final PatientAppointmentService patientAppointmentService;
 
-  @PostMapping(SAVE_PATIENT_APPOINTMENT)
-  public ResponseEntity<?> savePatientAppointment(@RequestBody PatientAppointmentDTO patientAppointmentDTO){
-      patientAppointmentService.savePatientAppointment(patientAppointmentDTO);
-      return ResponseEntity.ok().body("succesfully save");
-  }
+    @PostMapping(SAVE_PATIENT_APPOINTMENT)
+    public ResponseEntity<?> savePatientAppointment(@RequestBody PatientAppointmentDTO patientAppointmentDTO, Principal principal){
+        patientAppointmentService.savePatientAppointment(patientAppointmentDTO,principal);
+        return ResponseEntity.ok().body(Map.of("message", "successfully saved"));
+    }
 }

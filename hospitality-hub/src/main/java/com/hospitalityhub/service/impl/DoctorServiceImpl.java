@@ -14,11 +14,9 @@ import com.hospitalityhub.shared.ResponseMessageConstant;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -149,7 +147,16 @@ public class DoctorServiceImpl {
         dto.setDescription(doctor.getDoctorDescription());
         return dto;
     }
+    public DoctorDto findDoctorByUsername(String username) {
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new ResourceAccessException("User not found with email: " + username));
 
+        Doctor doctor = doctorRepository.findById(user.getUserId())
+                .orElseThrow(() -> new ResourceAccessException("Doctor profile not found for user: " + username));
+
+        // Convert and return as DTO
+        return mapToDto(doctor);
+    }
 
 }
 

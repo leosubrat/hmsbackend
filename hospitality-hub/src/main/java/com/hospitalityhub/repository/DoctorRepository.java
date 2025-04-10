@@ -11,4 +11,5 @@ public interface DoctorRepository extends JpaRepository<Doctor,Integer> {
     Optional<Doctor> findByUser(User user);
 
 
+    Doctor findByLicenseNumber(String licenseNumber);
 }

@@ -18,6 +18,7 @@ public class DoctorDto {
     private String salary;
     private String description;
     private byte[] photo;
+    private String licenseNumber;
     // Lists of time slots for today and tomorrow
     // Each time slot is a map with "startTime" and "endTime" keys
     private List<Map<String, String>> todayAvailability;
