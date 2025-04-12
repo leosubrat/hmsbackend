@@ -33,6 +33,7 @@ public class DoctorServiceImpl {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final DoctorAvailabilityRepository availabilityRepository;
+
     public List<DoctorDto> findAllDoctor() {
         List<Doctor> doctorList = doctorRepository.findAll();
         List<DoctorDto> doctorDtoList = new ArrayList<>();
