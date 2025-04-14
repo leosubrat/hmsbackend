@@ -32,7 +32,7 @@ public class DoctorController {
     @PutMapping(DOCTOR_UPDATE)
     public ResponseEntity<DoctorDto> updateDoctorProfile(@RequestBody DoctorDto doctorDto, Principal principal) {
         String username = principal.getName();
-        DoctorDto updatedDoctor = doctorService.updateDoctorProfile(username, doctorDto);
+        DoctorDto updatedDoctor = doctorService.updateDoctorProfile(username,doctorDto);
         return ResponseEntity.ok(updatedDoctor);
     }
 }

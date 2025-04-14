@@ -2,7 +2,6 @@ package com.hospitalityhub.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +18,11 @@ public class DoctorDto {
     private String description;
     private byte[] photo;
     private String licenseNumber;
-    // Lists of time slots for today and tomorrow
-    // Each time slot is a map with "startTime" and "endTime" keys
-    private List<Map<String, String>> todayAvailability;
-    private List<Map<String, String>> tomorrowAvailability;
+
+    // Add these fields for the custom date availability
+    private String selectedDate;
+    private List<Map<String, String>> timeSlots;
+
+    // Keep this field if you need it for other purposes
+    private DoctorAvailabilityDTO doctorAvailability;
 }

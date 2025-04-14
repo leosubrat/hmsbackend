@@ -7,6 +7,7 @@ import com.hospitalityhub.entity.Doctor;
 import com.hospitalityhub.entity.DoctorAvailability;
 import com.hospitalityhub.entity.User;
 import com.hospitalityhub.exception.UserAlreadyExistException;
+import com.hospitalityhub.exception.UserNotFoundException;
 import com.hospitalityhub.repository.DoctorAvailabilityRepository;
 import com.hospitalityhub.repository.DoctorRepository;
 import com.hospitalityhub.repository.UserRepository;
@@ -44,90 +45,111 @@ public class DoctorServiceImpl {
             doctorDto.setExperience(doctor.getYearsOfExperience());
             doctorDto.setExpertise(doctor.getSpecialization());
             doctorDto.setDescription(doctor.getDoctorDescription());
+            doctorDto.setLicenseNumber(doctor.getLicenseNumber());
             doctorDtoList.add(doctorDto);
         }
         return doctorDtoList;
     }
 
-    public void updateDoctor(Authentication authentication,DoctorDto doctorDto) {
-        String principal = authentication.getName();
-        Optional<User> userFindByEmail = userRepository.findByEmail(principal);
-        if (userFindByEmail.isPresent()) {
-            throw new UserAlreadyExistException(ResponseMessageConstant.ALREADY_REGISTER);
-        }
-        User user = userFindByEmail.get();
-        doctorDto.setFirstName(user.getFirstName());
-        doctorDto.setMiddleName(user.getMiddleName());
-        doctorDto.setLastName(user.getLastName());
-        Doctor doctor = objectMapper.convertValue(doctorDto,Doctor.class);
-        doctorRepository.save(doctor);
-    }
-
-    public DoctorDto getDoctorByUsername(String email) {
-        User user = userRepository.findByEmail(email)
+    @Transactional
+    public DoctorDto updateDoctorProfile(String username, DoctorDto doctorDto) {
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Doctor doctor = doctorRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        DoctorDto doctorDto = mapToDto(doctor);
-
-        List<DoctorAvailability> availabilities = availabilityRepository.findByDoctorIdAndDateGreaterThanEqual(
-                doctor.getDoctorId(), LocalDate.now());
-
-        Map<LocalDate, List<DoctorAvailability>> availabilitiesByDate = availabilities.stream()
-                .collect(Collectors.groupingBy(DoctorAvailability::getDate));
-
-        LocalDate today = LocalDate.now();
-        if (availabilitiesByDate.containsKey(today)) {
-            doctorDto.setTodayAvailability(mapAvailabilityToTimeSlots(availabilitiesByDate.get(today))
-            );
-        }
-
-        LocalDate tomorrow = today.plusDays(1);
-        if (availabilitiesByDate.containsKey(tomorrow)) {
-            doctorDto.setTomorrowAvailability(
-                    mapAvailabilityToTimeSlots(availabilitiesByDate.get(tomorrow))
-            );
-        }
-
-        return doctorDto;
-    }
-
-    @Transactional
-    public DoctorDto updateDoctorProfile(String username, DoctorDto doctorDto) {
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
-        Doctor doctor = doctorRepository.findByUser(user).orElseThrow(() -> new RuntimeException("Doctor not found"));//        doctor.setDoctorDescription(doctorDto.getDescription());
+        // Update doctor description
         doctor.setDoctorDescription(doctorDto.getDescription());
         Doctor updatedDoctor = doctorRepository.save(doctor);
-        updateAvailability(updatedDoctor.getDoctorId(), LocalDate.now(), doctorDto.getTodayAvailability());
-        updateAvailability(updatedDoctor.getDoctorId(), LocalDate.now().plusDays(1), doctorDto.getTomorrowAvailability());
-        return getDoctorByUsername(username);
+
+        if (doctorDto.getSelectedDate() != null && doctorDto.getTimeSlots() != null) {
+            LocalDate selectedDate = LocalDate.parse(doctorDto.getSelectedDate());
+
+            // Delete existing availability for this date
+            availabilityRepository.deleteByDoctorIdAndDate(doctor.getDoctorId(), selectedDate);
+
+            // Create and save new availability entries
+            List<DoctorAvailability> availabilities = new ArrayList<>();
+            for (Map<String, String> slot : doctorDto.getTimeSlots()) {
+                DoctorAvailability availability = new DoctorAvailability();
+                availability.setDoctorId(doctor.getDoctorId());
+                availability.setDate(selectedDate);
+                availability.setStartTime(LocalTime.parse(slot.get("startTime")));
+                availability.setEndTime(LocalTime.parse(slot.get("endTime")));
+                availabilities.add(availability);
+            }
+
+            if (!availabilities.isEmpty()) {
+                availabilityRepository.saveAll(availabilities);
+            }
+        }
+
+        DoctorDto updatedDoctorDto = mapToDto(updatedDoctor);
+
+        // Include the updated time slots in the response
+        if (doctorDto.getSelectedDate() != null) {
+            LocalDate selectedDate = LocalDate.parse(doctorDto.getSelectedDate());
+            List<DoctorAvailability> availabilities =
+                    availabilityRepository.findByDoctorIdAndDate(doctor.getDoctorId(), selectedDate);
+
+            updatedDoctorDto.setTimeSlots(mapAvailabilityToTimeSlots(availabilities));
+            updatedDoctorDto.setSelectedDate(doctorDto.getSelectedDate());
+        }
+
+        return updatedDoctorDto;
     }
 
-    private void updateAvailability(int doctorId, LocalDate date, List<Map<String, String>> timeSlots) {
-        if (timeSlots == null || timeSlots.isEmpty()) {
-            return;
+    private DoctorDto mapToDto(Doctor doctor) {
+        DoctorDto dto = new DoctorDto();
+
+        // Map basic properties
+        dto.setDoctorId(doctor.getDoctorId());
+
+        if (doctor.getUser() != null) {
+            dto.setFirstName(doctor.getUser().getFirstName());
+            dto.setMiddleName(doctor.getUser().getMiddleName());
+            dto.setLastName(doctor.getUser().getLastName());
         }
+        dto.setExperience(doctor.getYearsOfExperience());
+        dto.setExpertise(doctor.getExpertise());
+        dto.setSalary(doctor.getSalary());
+        dto.setDescription(doctor.getDoctorDescription());
+        dto.setLicenseNumber(doctor.getLicenseNumber());
+
+
+        return dto;
+    }
+
+
+    @Transactional
+    public Map<String, List<Map<String, String>>> updateAvailabilityForDate(int doctorId, String dateStr, List<Map<String, String>> timeSlots) {
+        LocalDate date = LocalDate.parse(dateStr);
+
         availabilityRepository.deleteByDoctorIdAndDate(doctorId, date);
-        List<DoctorAvailability> newAvailabilities = new ArrayList<>();
 
+        // Create and save new availability records
+        List<DoctorAvailability> availabilities = new ArrayList<>();
         for (Map<String, String> slot : timeSlots) {
-            LocalTime startTime = LocalTime.parse(slot.get("startTime"));
-            LocalTime endTime = LocalTime.parse(slot.get("endTime"));
-
             DoctorAvailability availability = new DoctorAvailability();
             availability.setDoctorId(doctorId);
             availability.setDate(date);
-            availability.setStartTime(startTime);
-            availability.setEndTime(endTime);
-
-            newAvailabilities.add(availability);
+            availability.setStartTime(LocalTime.parse(slot.get("startTime")));
+            availability.setEndTime(LocalTime.parse(slot.get("endTime")));
+            availabilities.add(availability);
         }
 
-        availabilityRepository.saveAll(newAvailabilities);
-    }
+        if (!availabilities.isEmpty()) {
+            availabilityRepository.saveAll(availabilities);
+        }
 
+        // Retrieve and return the updated availability
+        List<DoctorAvailability> updatedAvailabilities = availabilityRepository.findByDoctorIdAndDate(doctorId, date);
+        List<Map<String, String>> updatedTimeSlots = mapAvailabilityToTimeSlots(updatedAvailabilities);
+
+        // Return as a map with the date as key
+        return Map.of(dateStr, updatedTimeSlots);
+    }
     private List<Map<String, String>> mapAvailabilityToTimeSlots(List<DoctorAvailability> availabilities) {
         return availabilities.stream()
                 .map(a -> Map.of(
@@ -136,23 +158,11 @@ public class DoctorServiceImpl {
                 ))
                 .collect(Collectors.toList());
     }
-
-    private DoctorDto mapToDto(Doctor doctor) {
-        DoctorDto dto = new DoctorDto();
-        dto.setDoctorId(doctor.getDoctorId());
-        dto.setFirstName(doctor.getUser().getFirstName());
-        dto.setLastName(doctor.getUser().getLastName());
-        dto.setExperience(doctor.getYearsOfExperience());
-        dto.setExpertise(doctor.getExpertise());
-        dto.setSalary(doctor.getSalary());
-        dto.setDescription(doctor.getDoctorDescription());
-        return dto;
-    }
     public DoctorDto findDoctorByUsername(String username) {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new ResourceAccessException("User not found with email: " + username));
 
-        Doctor doctor = doctorRepository.findById(user.getUserId())
+        Doctor doctor = doctorRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceAccessException("Doctor profile not found for user: " + username));
 
         // Convert and return as DTO
@@ -160,4 +170,3 @@ public class DoctorServiceImpl {
     }
 
 }
-

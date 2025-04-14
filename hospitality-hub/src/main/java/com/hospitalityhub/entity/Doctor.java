@@ -25,6 +25,7 @@ public class Doctor {
     private String salary;
    private byte[] photo;
 
+
 }
 //rimesh1@gmail.com
 //Rimesh1@@
