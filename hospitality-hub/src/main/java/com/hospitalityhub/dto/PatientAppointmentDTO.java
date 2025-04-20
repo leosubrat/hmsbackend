@@ -22,6 +22,7 @@ public class PatientAppointmentDTO {
     private String doctorName;
     private String doctorSpecialty;
     private String licenseNumber;
+    private boolean status;
 
     // Default constructor
     public PatientAppointmentDTO() {

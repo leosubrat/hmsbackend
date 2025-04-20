@@ -50,4 +50,6 @@ public class PatientAppointment {
     @Column(name = "doctor_specialty")
     private String doctorSpecialty;
 
+    @Column(name="status")
+    private boolean status;
 }

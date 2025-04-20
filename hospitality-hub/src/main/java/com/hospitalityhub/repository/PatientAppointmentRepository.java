@@ -8,4 +8,6 @@ import java.util.List;
 public interface PatientAppointmentRepository extends JpaRepository<PatientAppointment,Long> {
 
     List<PatientAppointment> findByPatientEmail(String email);
+
+    PatientAppointment findByStatus(boolean status);
 }

@@ -65,7 +65,7 @@ public class PatientAppointmentServiceImpl implements PatientAppointmentService 
             Optional<Doctor> doctor = doctorRepository.findByUser(user.get());
             List<PatientAppointment> patientAppointments = patientAppointmentRepository.findAll();
             for (PatientAppointment patientAppointment : patientAppointments) {
-                if (doctor.isPresent()) {
+                if (doctor.isPresent()&&!patientAppointment.isStatus()) {
                     if (doctor.get().getDoctorId() == patientAppointment.getDoctorId()) {
                         patientAppointmentsList.add(patientAppointment);
                     }
