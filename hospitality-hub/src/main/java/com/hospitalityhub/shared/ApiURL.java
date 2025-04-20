@@ -16,4 +16,6 @@ public class ApiURL {
     public final static String USER_PROFILE=BASE_URL+"/user/profile";
     public static final String PATIENT_UPDATE = BASE_URL+"/user/update";
     public static final String GET_USER_DETAILS = BASE_URL+"/get/user/detail";
+    public static final String PATIENT_DETAIL = BASE_URL+"/patient/detail";
+    public static final String APPROVED =BASE_URL+"/approved" ;
 }

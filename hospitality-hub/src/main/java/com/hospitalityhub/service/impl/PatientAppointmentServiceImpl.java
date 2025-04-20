@@ -1,12 +1,15 @@
 package com.hospitalityhub.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hospitalityhub.dto.AppointmentDto;
 import com.hospitalityhub.dto.DoctorDto;
 import com.hospitalityhub.dto.PatientAppointmentDTO;
 import com.hospitalityhub.dto.UserDto;
 import com.hospitalityhub.entity.Doctor;
+import com.hospitalityhub.entity.DoctorAvailability;
 import com.hospitalityhub.entity.PatientAppointment;
 import com.hospitalityhub.entity.User;
+import com.hospitalityhub.repository.DoctorAvailabilityRepository;
 import com.hospitalityhub.repository.DoctorRepository;
 import com.hospitalityhub.repository.PatientAppointmentRepository;
 import com.hospitalityhub.repository.UserRepository;
@@ -24,16 +27,18 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PatientAppointmentServiceImpl implements PatientAppointmentService{
-private final ObjectMapper objectMapper;
-private final PatientAppointmentRepository patientAppointmentRepository;
-private final DoctorNotificationService notificationService;
-private final DoctorServiceImpl doctorService;
-private  final DoctorRepository doctorRepository;
-private final UserRepository userRepository;
+public class PatientAppointmentServiceImpl implements PatientAppointmentService {
+    private final ObjectMapper objectMapper;
+    private final PatientAppointmentRepository patientAppointmentRepository;
+    private final DoctorNotificationService notificationService;
+    private final DoctorServiceImpl doctorService;
+    private final DoctorRepository doctorRepository;
+    private final UserRepository userRepository;
+    private final DoctorAvailabilityRepository doctorAvailabilityRepository;
+
     @Override
     public void savePatientAppointment(PatientAppointmentDTO patientAppointmentDTO, Principal principal) {
-        if (patientAppointmentDTO==null){
+        if (patientAppointmentDTO == null) {
             throw new NotFoundException("patientAppointment is not found");
         }
         String licenseNumber = patientAppointmentDTO.getLicenseNumber();
@@ -50,6 +55,25 @@ private final UserRepository userRepository;
                 savedAppointment.getId()
         );
 
+    }
+
+    public List<PatientAppointment> patientAppointmentDTOList(String doctorEmail) {
+        List<PatientAppointment> patientAppointmentsList = new ArrayList<>();
+        Optional<User> user = userRepository.findByEmail(doctorEmail);
+        System.out.println(user);
+        if (user.isPresent()) {
+            Optional<Doctor> doctor = doctorRepository.findByUser(user.get());
+            List<PatientAppointment> patientAppointments = patientAppointmentRepository.findAll();
+            for (PatientAppointment patientAppointment : patientAppointments) {
+                if (doctor.isPresent()) {
+                    if (doctor.get().getDoctorId() == patientAppointment.getDoctorId()) {
+                        patientAppointmentsList.add(patientAppointment);
+                    }
+                }
+            }
+        }
+
+        return patientAppointmentsList;
     }
 
     @Override
@@ -76,10 +100,21 @@ private final UserRepository userRepository;
     @Override
     public UserDto getUserDetails(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isEmpty()){
+        List<Doctor> doctorList = doctorRepository.findAll();
+        List<DoctorAvailability> doctorAvailabilities = doctorAvailabilityRepository.findAll();
+        if (optionalUser.isEmpty()) {
             throw new NotFoundException("user is not found");
         }
+        List<DoctorAvailability> doctorAvailabilities1 = new ArrayList<>();
+        for (Doctor doctor : doctorList) {
+            for (DoctorAvailability doctorAvailability : doctorAvailabilities) {
+                if (doctor.getDoctorId() == doctorAvailability.getDoctorId()) {
+                    doctorAvailabilities1.add(doctorAvailability);
+                }
+            }
+        }
         UserDto userDto = new UserDto();
+        userDto.setDoctorAvailabilities(doctorAvailabilities1);
         userDto.setFirstName(optionalUser.get().getFirstName());
         userDto.setMiddleName(optionalUser.get().getMiddleName());
         userDto.setLastName(optionalUser.get().getLastName());

@@ -50,4 +50,9 @@ public class PatientAppointmentController {
         return ResponseEntity.ok().body(Objects.requireNonNullElse(userDto, Collections.emptyList()));
     }
 
+    @GetMapping(ApiURL.PATIENT_DETAIL)
+    public ResponseEntity<?> getAllPatientDetails(Principal principal){
+        return ResponseEntity.ok().body(patientAppointmentService.patientAppointmentDTOList(principal.getName()));
+    }
+
 }

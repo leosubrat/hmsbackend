@@ -40,6 +40,7 @@ public class DoctorServiceImpl {
         List<DoctorDto> doctorDtoList = new ArrayList<>();
         for (Doctor doctor : doctorList) {
             DoctorDto doctorDto = new DoctorDto();
+            doctorDto.setDoctorId(doctor.getDoctorId());
             doctorDto.setFirstName(doctor.getUser().getFirstName());
             doctorDto.setLastName(doctor.getUser().getLastName());
             doctorDto.setExperience(doctor.getYearsOfExperience());

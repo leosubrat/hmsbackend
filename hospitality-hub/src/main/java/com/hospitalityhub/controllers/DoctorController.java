@@ -35,4 +35,11 @@ public class DoctorController {
         DoctorDto updatedDoctor = doctorService.updateDoctorProfile(username,doctorDto);
         return ResponseEntity.ok(updatedDoctor);
     }
+
+//    @PostMapping(ApiURL.APPROVED)
+//    public ResponseEntity<?> approvedByDoctor(@RequestParam boolean status){
+//        if (status==true){
+//
+//        }
+//    }
 }

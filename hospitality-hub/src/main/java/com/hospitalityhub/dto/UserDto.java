@@ -1,9 +1,12 @@
 package com.hospitalityhub.dto;
 
+import com.hospitalityhub.entity.DoctorAvailability;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -18,4 +21,5 @@ public class UserDto {
     private String password;
     private String forgetPasswordCode;
     private String phone;
+    private List<DoctorAvailability> doctorAvailabilities;
 }

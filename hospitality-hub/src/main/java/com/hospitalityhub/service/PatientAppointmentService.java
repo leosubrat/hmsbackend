@@ -14,4 +14,6 @@ public interface PatientAppointmentService {
 
      UserDto getUserDetails(String email);
 
+    public List<PatientAppointment> patientAppointmentDTOList(String doctorEmail);
+
 }

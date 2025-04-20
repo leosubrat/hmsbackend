@@ -24,8 +24,7 @@ public class Doctor {
     private String expertise;
     private String salary;
    private byte[] photo;
-
-
+   private String email;
 }
 //rimesh1@gmail.com
 //Rimesh1@@
