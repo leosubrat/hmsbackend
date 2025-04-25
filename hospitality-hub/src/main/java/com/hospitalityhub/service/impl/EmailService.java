@@ -1,4 +1,4 @@
-package com.hospitalityhub.service;
+package com.hospitalityhub.service.impl;
 
 
 import org.springframework.mail.SimpleMailMessage;

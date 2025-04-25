@@ -19,4 +19,6 @@ public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvaila
     void deleteByDoctorIdAndDate(int doctorId, LocalDate date);
 
     Optional<Doctor> findById(Optional<Doctor> byId);
+
+    List<DoctorAvailability> findByDoctorId(Long doctorId);
 }

@@ -48,6 +48,7 @@ public class PatientAppointmentServiceImpl implements PatientAppointmentService 
 
         }
         PatientAppointment patientAppointment = objectMapper.convertValue(patientAppointmentDTO, PatientAppointment.class);
+        patientAppointment.setStatus(false);
         PatientAppointment savedAppointment = patientAppointmentRepository.save(patientAppointment);
         notificationService.createAppointmentNotification(
                 byLicenseNumber.getDoctorId(),

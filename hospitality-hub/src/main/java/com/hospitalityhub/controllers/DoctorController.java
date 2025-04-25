@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.hospitalityhub.shared.ApiURL.DOCTOR_UPDATE;
 
@@ -26,24 +28,16 @@ public class DoctorController {
     }
 
     @PutMapping(DOCTOR_UPDATE)
-    public ResponseEntity<DoctorDto> updateDoctorProfile(@RequestBody DoctorDto doctorDto, Principal principal) {
+    public ResponseEntity<?> updateDoctorProfile(@RequestBody DoctorDto doctorDto, Principal principal) {
         String username = principal.getName();
         DoctorDto updatedDoctor = doctorService.updateDoctorProfile(username, doctorDto);
-        return ResponseEntity.ok(updatedDoctor);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", updatedDoctor);
+        response.put("message", "Profile updated successfully");
+        response.put("status", true);
+
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping(ApiURL.APPOINTMENTS_APPROVED)
-    public ResponseEntity<?> approvedByDoctor(@RequestParam boolean status) {
-        PatientAppointment byStatus = patientAppointmentRepository.findByStatus(status);
-        System.out.println(byStatus);
-        try{
-            if (byStatus.isStatus()){
-                byStatus.setStatus(true);
-            }
-        }catch (NullPointerException exception){
-            throw new NullPointerException("status is not found");
-        }
-
-        return ResponseEntity.ok().body("Approved by doctor");
-    }
 }

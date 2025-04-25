@@ -13,6 +13,6 @@ public interface DoctorNotificationRepository extends JpaRepository<DoctorNotifi
 
     List<DoctorNotification> findByDoctorIdOrderByCreatedAtDesc(Long doctorId);
 
-    @Query("SELECT COUNT(n) FROM DoctorNotification n WHERE n.doctorId = :doctorId AND n.isRead = false")
+    @Query("SELECT COUNT(n) FROM DoctorNotification n JOIN PatientAppointment p ON n.appointmentId = p.id WHERE n.doctorId = :doctorId AND n.isRead = false AND p.status = false")
     Long countUnreadNotifications(@Param("doctorId") Long doctorId);
 }
