@@ -18,7 +18,7 @@ public class DoctorDto {
     private String description;
     private byte[] photo;
     private String licenseNumber;
-
+   private String specialization;
     // Add these fields for the custom date availability
     private String selectedDate;
     private List<Map<String, String>> timeSlots;

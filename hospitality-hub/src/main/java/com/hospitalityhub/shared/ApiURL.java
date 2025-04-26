@@ -21,5 +21,6 @@ public class ApiURL {
     public static final String CREATE_WITH_TEST=BASE_URL+"/package/with-tests";
     public static final String GET_ALL_PACKAGE=BASE_URL+"/package";
     public static final  String DELETE_PACKAGE=BASE_URL+"/delete/package";
+    public static final String GET_ALL_USER=BASE_URL+"/get-all-user";
 
 }

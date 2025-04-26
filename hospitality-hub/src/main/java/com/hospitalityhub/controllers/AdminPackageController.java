@@ -1,7 +1,6 @@
 package com.hospitalityhub.controllers;
 
 import com.hospitalityhub.dto.AdminPackageDTO;
-import com.hospitalityhub.entity.AdminPackage;
 import com.hospitalityhub.service.impl.AdminPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.hospitalityhub.shared.ApiURL.*;
 
@@ -40,5 +38,35 @@ public class AdminPackageController {
     public ResponseEntity<Void> deletePackage(@RequestParam Integer packageId) {
         adminPackageService.deletePackage(packageId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("api/package/approve")
+    public ResponseEntity<?> approvePackage(@RequestParam Integer packageId) {
+        try {
+            adminPackageService.approvePackageByUser(packageId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Package approved successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to approve package");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("api/package/approved")
+    public ResponseEntity<?> getApprovedPackages() {
+        try {
+            List<AdminPackageDTO> approvedPackages = adminPackageService.approvedPackageList();
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", approvedPackages);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to retrieve approved packages");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 }

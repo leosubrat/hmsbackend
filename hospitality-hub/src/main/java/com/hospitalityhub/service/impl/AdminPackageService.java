@@ -3,14 +3,17 @@ package com.hospitalityhub.service.impl;
 import com.hospitalityhub.dto.AdminPackageDTO;
 import com.hospitalityhub.entity.AdminPackage;
 import com.hospitalityhub.repository.AdminPackageRepository;
+import org.hibernate.dialect.pagination.LimitOffsetLimitHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 @Service
@@ -24,6 +27,7 @@ public class AdminPackageService {
         adminPackage.setPackagePrice(dto.getPackagePrice());
         adminPackage.setDescription(dto.getDescription());
         adminPackage.setTestType(dto.getTestType());
+        adminPackage.setStatus(FALSE);
         adminPackageRepository.save(adminPackage);
     }
 
@@ -42,10 +46,31 @@ public class AdminPackageService {
                 .collect(Collectors.toList());
     }
 
-    public void deletePackage(@RequestParam Integer packageId) {
+    public void deletePackage(Integer packageId) {
         Optional<AdminPackage> adminPackage = adminPackageRepository.findById(packageId);
         if (adminPackage.isPresent()) {
             adminPackageRepository.deleteById(packageId);
         }
+    }
+
+    public void approvePackageByUser(Integer packageId){
+        if (packageId!=null){
+            Optional<AdminPackage> optionalAdminPackage = adminPackageRepository.findById(packageId);
+            optionalAdminPackage.ifPresent(adminPackage -> adminPackage.setStatus(TRUE));
+            optionalAdminPackage.ifPresent(adminPackage -> adminPackageRepository.save(adminPackage));
+        }
+    }
+    public List<AdminPackageDTO> approvedPackageList(){
+        List<AdminPackage> packageList = adminPackageRepository.findAll();
+        return packageList.stream().filter(AdminPackage::isStatus).map(adminPackage -> {
+            AdminPackageDTO adminPackageDTO = new AdminPackageDTO();
+            adminPackageDTO.setPackageId(adminPackage.getPackageId());
+            adminPackageDTO.setPackagePrice(adminPackage.getPackagePrice());
+            adminPackageDTO.setPackageName(adminPackage.getPackageName());
+            adminPackageDTO.setTestType(adminPackage.getTestType());
+            adminPackageDTO.setDescription(adminPackage.getDescription());
+           return adminPackageDTO;
+        }).collect(Collectors.toList());
+
     }
 }

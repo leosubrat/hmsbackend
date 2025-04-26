@@ -19,4 +19,5 @@ public class AdminPackage {
     private Integer packagePrice;
     private String description;
     private String testType;
+    private boolean status;
 }

@@ -5,6 +5,7 @@ import com.hospitalityhub.config.JwtService;
 import com.hospitalityhub.config.UserDetailService;
 import com.hospitalityhub.dto.SignUpRequest;
 import com.hospitalityhub.dto.SigninRequest;
+import com.hospitalityhub.dto.UserDoctorDto;
 import com.hospitalityhub.dto.UserDto;
 import com.hospitalityhub.entity.Doctor;
 import com.hospitalityhub.entity.Role;
@@ -20,14 +21,12 @@ import com.hospitalityhub.shared.ResponseMessageConstant;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -140,5 +139,54 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return "user is not found";
     }
 
+    public List<UserDoctorDto> userList() {
+        List<UserDoctorDto> userDoctorDtoList = new ArrayList<>();
+        List<User> userList = userRepository.findAll();
+        for (User user : userList) {
+            UserDoctorDto userDoctorDto = new UserDoctorDto();
+            if (user.getRole().equals("DOCTOR") || user.getRole().equals("USER")) {
+                Optional<Doctor> doctor = doctorRepository.findByUser(user);
+                userDoctorDto.setId(user.getUserId());
+                if (doctor.isPresent()) {
+                    userDoctorDto.setDescription(doctor.get().getDoctorDescription());
+                    userDoctorDto.setLiscenceNumber(doctor.get().getLicenseNumber());
+                    userDoctorDto.setSpecialization(doctor.get().getSpecialization());
+                }
+                userDoctorDto.setFirstName(user.getFirstName());
+                userDoctorDto.setMiddleName(user.getMiddleName());
+                userDoctorDto.setLastName(user.getLastName());
+                userDoctorDto.setPhone(user.getPhone());
+                userDoctorDto.setEmail(user.getEmail());
+                userDoctorDto.setRole(user.getRole());
+                userDoctorDtoList.add(userDoctorDto);
+            }
+
+        }
+        return userDoctorDtoList;
+    }
+
+    public void updateUserDoctorByAdmin(Integer id, UserDoctorDto userDoctorDto) {
+        if (id != null) {
+            Optional<User> optionalUser = userRepository.findById(id);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setFirstName(userDoctorDto.getFirstName());
+                user.setMiddleName(userDoctorDto.getMiddleName());
+                user.setLastName(userDoctorDto.getLastName());
+                user.setEmail(userDoctorDto.getEmail());
+                user.setPhone(userDoctorDto.getPhone());
+                userRepository.save(user);
+            }
+        }
+    }
+   public  void deleteUserDoctorByAdmin(Integer id){
+         if (id!=null){
+             Optional<User> optionalUser = userRepository.findById(id);
+             Optional<Doctor> optionalDoctor=doctorRepository.findByUser(optionalUser.get());
+             optionalDoctor.ifPresent(doctorRepository::delete);
+             optionalUser.ifPresent(userRepository::delete);
+
+         }
+    }
 
 }
