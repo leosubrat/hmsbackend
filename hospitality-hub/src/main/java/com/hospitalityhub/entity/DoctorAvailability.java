@@ -30,4 +30,7 @@ public class DoctorAvailability {
 
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
+
+    @Column(name = "time_status")
+    private boolean timeStatus;
 }

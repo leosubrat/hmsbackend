@@ -13,4 +13,7 @@ public class AdminPackageDTO {
         private Integer packagePrice;
         private String description;
         private String testType;
+        private String firstName;
+        private String lastName;
+        private String phoneNumber;
 }

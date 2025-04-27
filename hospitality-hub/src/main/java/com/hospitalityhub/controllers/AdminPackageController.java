@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +42,9 @@ public class AdminPackageController {
     }
 
     @PutMapping("api/package/approve")
-    public ResponseEntity<?> approvePackage(@RequestParam Integer packageId) {
+    public ResponseEntity<?> approvePackage(@RequestParam Integer packageId,Principal principal) {
         try {
-            adminPackageService.approvePackageByUser(packageId);
+            adminPackageService.approvePackageByUser(packageId,principal.getName());
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Package approved successfully");
             return ResponseEntity.ok(response);

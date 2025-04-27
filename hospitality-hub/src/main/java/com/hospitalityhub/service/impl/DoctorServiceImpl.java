@@ -67,7 +67,6 @@ public class DoctorServiceImpl {
         if (doctorDto.getSelectedDate() != null && doctorDto.getTimeSlots() != null) {
             LocalDate selectedDate = LocalDate.parse(doctorDto.getSelectedDate());
 
-            // Delete existing availability for this date
             availabilityRepository.deleteByDoctorIdAndDate(doctor.getDoctorId(), selectedDate);
 
             // Create and save new availability entries
@@ -76,6 +75,7 @@ public class DoctorServiceImpl {
                 DoctorAvailability availability = new DoctorAvailability();
                 availability.setDoctorId(doctor.getDoctorId());
                 availability.setDate(selectedDate);
+                availability.setTimeStatus(false);
                 availability.setStartTime(LocalTime.parse(slot.get("startTime")));
                 availability.setEndTime(LocalTime.parse(slot.get("endTime")));
                 availabilities.add(availability);

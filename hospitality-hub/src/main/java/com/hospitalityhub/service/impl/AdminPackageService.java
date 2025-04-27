@@ -2,13 +2,12 @@ package com.hospitalityhub.service.impl;
 
 import com.hospitalityhub.dto.AdminPackageDTO;
 import com.hospitalityhub.entity.AdminPackage;
+import com.hospitalityhub.entity.User;
 import com.hospitalityhub.repository.AdminPackageRepository;
-import org.hibernate.dialect.pagination.LimitOffsetLimitHandler;
+import com.hospitalityhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +19,9 @@ import static java.lang.Boolean.TRUE;
 public class AdminPackageService {
     @Autowired
     private AdminPackageRepository adminPackageRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public void createPackageByAdmin(AdminPackageDTO dto) {
         AdminPackage adminPackage = new AdminPackage();
@@ -53,15 +55,24 @@ public class AdminPackageService {
         }
     }
 
-    public void approvePackageByUser(Integer packageId){
-        if (packageId!=null){
+    public void approvePackageByUser(Integer packageId, String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (packageId != null) {
             Optional<AdminPackage> optionalAdminPackage = adminPackageRepository.findById(packageId);
-            optionalAdminPackage.ifPresent(adminPackage -> adminPackage.setStatus(TRUE));
-            optionalAdminPackage.ifPresent(adminPackage -> adminPackageRepository.save(adminPackage));
+            if (optionalAdminPackage.isPresent() && user.isPresent()) {
+                AdminPackage adminPackage = optionalAdminPackage.get();
+                adminPackage.setStatus(TRUE);
+                adminPackage.setUserId(user.get().getUserId());
+                adminPackageRepository.save(adminPackage);
+            }
         }
     }
-    public List<AdminPackageDTO> approvedPackageList(){
+
+    public List<AdminPackageDTO> approvedPackageList() {
+
         List<AdminPackage> packageList = adminPackageRepository.findAll();
+        // Get user information if available
+
         return packageList.stream().filter(AdminPackage::isStatus).map(adminPackage -> {
             AdminPackageDTO adminPackageDTO = new AdminPackageDTO();
             adminPackageDTO.setPackageId(adminPackage.getPackageId());
@@ -69,8 +80,17 @@ public class AdminPackageService {
             adminPackageDTO.setPackageName(adminPackage.getPackageName());
             adminPackageDTO.setTestType(adminPackage.getTestType());
             adminPackageDTO.setDescription(adminPackage.getDescription());
-           return adminPackageDTO;
-        }).collect(Collectors.toList());
 
+            // Get user information if available
+            Optional<User> user = userRepository.findById(adminPackage.getUserId());
+
+            if (user.isPresent()) {
+                adminPackageDTO.setFirstName(user.get().getFirstName());
+                adminPackageDTO.setLastName(user.get().getLastName());
+                adminPackageDTO.setPhoneNumber(user.get().getPhone());
+            }
+
+            return adminPackageDTO;
+        }).collect(Collectors.toList());
     }
 }

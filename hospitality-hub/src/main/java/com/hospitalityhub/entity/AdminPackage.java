@@ -20,4 +20,5 @@ public class AdminPackage {
     private String description;
     private String testType;
     private boolean status;
+    private Integer userId;
 }
