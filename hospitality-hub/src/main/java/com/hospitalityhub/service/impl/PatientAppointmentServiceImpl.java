@@ -1,8 +1,6 @@
 package com.hospitalityhub.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hospitalityhub.dto.AppointmentDto;
-import com.hospitalityhub.dto.DoctorDto;
 import com.hospitalityhub.dto.PatientAppointmentDTO;
 import com.hospitalityhub.dto.UserDto;
 import com.hospitalityhub.entity.Doctor;
@@ -15,8 +13,6 @@ import com.hospitalityhub.repository.PatientAppointmentRepository;
 import com.hospitalityhub.repository.UserRepository;
 import com.hospitalityhub.service.PatientAppointmentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
@@ -49,12 +45,30 @@ public class PatientAppointmentServiceImpl implements PatientAppointmentService 
         }
         PatientAppointment patientAppointment = objectMapper.convertValue(patientAppointmentDTO, PatientAppointment.class);
         patientAppointment.setStatus(false);
-        PatientAppointment savedAppointment = patientAppointmentRepository.save(patientAppointment);
-        notificationService.createAppointmentNotification(
-                byLicenseNumber.getDoctorId(),
-                patientAppointmentDTO.getPatientName(),
-                savedAppointment.getId()
-        );
+        List<PatientAppointment> all = patientAppointmentRepository.findAll();
+        if (all.isEmpty()) {
+            PatientAppointment savedAppointment = patientAppointmentRepository.save(patientAppointment);
+            notificationService.createAppointmentNotification(
+                    byLicenseNumber.getDoctorId(),
+                    patientAppointmentDTO.getPatientName(),
+                    savedAppointment.getId()
+            );
+        }
+        for (PatientAppointment patientAppointment1 : all) {
+            if (patientAppointment1.getAppointmentTime().equals(patientAppointmentDTO.getAppointmentTime())) {
+                break;
+            } else if (patientAppointment1.getPatientEmail().equals(patientAppointmentDTO.getPatientEmail())
+                    && patientAppointment1.getDoctorSpecialty().equals(patientAppointmentDTO.getDoctorSpecialty()) && patientAppointment1.getAppointmentDate().equals(patientAppointmentDTO.getAppointmentDate())) {
+                break;
+            } else {
+                PatientAppointment savedAppointment = patientAppointmentRepository.save(patientAppointment);
+                notificationService.createAppointmentNotification(
+                        byLicenseNumber.getDoctorId(),
+                        patientAppointmentDTO.getPatientName(),
+                        savedAppointment.getId()
+                );
+            }
+        }
 
     }
 
@@ -66,7 +80,7 @@ public class PatientAppointmentServiceImpl implements PatientAppointmentService 
             Optional<Doctor> doctor = doctorRepository.findByUser(user.get());
             List<PatientAppointment> patientAppointments = patientAppointmentRepository.findAll();
             for (PatientAppointment patientAppointment : patientAppointments) {
-                if (doctor.isPresent()&&!patientAppointment.isStatus()) {
+                if (doctor.isPresent() && !patientAppointment.isStatus()) {
                     if (doctor.get().getDoctorId() == patientAppointment.getDoctorId()) {
                         patientAppointmentsList.add(patientAppointment);
                     }
