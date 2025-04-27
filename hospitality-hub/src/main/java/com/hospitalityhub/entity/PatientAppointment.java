@@ -52,4 +52,7 @@ public class PatientAppointment {
 
     @Column(name="status")
     private boolean status;
+
+    private String description;
+
 }
