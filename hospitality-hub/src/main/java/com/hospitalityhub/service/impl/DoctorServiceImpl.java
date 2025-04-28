@@ -60,7 +60,6 @@ public class DoctorServiceImpl {
         Doctor doctor = doctorRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        // Update doctor description
         doctor.setDoctorDescription(doctorDto.getDescription());
         Doctor updatedDoctor = doctorRepository.save(doctor);
 
@@ -122,35 +121,6 @@ public class DoctorServiceImpl {
         return dto;
     }
 
-
-    @Transactional
-    public Map<String, List<Map<String, String>>> updateAvailabilityForDate(int doctorId, String dateStr, List<Map<String, String>> timeSlots) {
-        LocalDate date = LocalDate.parse(dateStr);
-
-        availabilityRepository.deleteByDoctorIdAndDate(doctorId, date);
-
-        // Create and save new availability records
-        List<DoctorAvailability> availabilities = new ArrayList<>();
-        for (Map<String, String> slot : timeSlots) {
-            DoctorAvailability availability = new DoctorAvailability();
-            availability.setDoctorId(doctorId);
-            availability.setDate(date);
-            availability.setStartTime(LocalTime.parse(slot.get("startTime")));
-            availability.setEndTime(LocalTime.parse(slot.get("endTime")));
-            availabilities.add(availability);
-        }
-
-        if (!availabilities.isEmpty()) {
-            availabilityRepository.saveAll(availabilities);
-        }
-
-        // Retrieve and return the updated availability
-        List<DoctorAvailability> updatedAvailabilities = availabilityRepository.findByDoctorIdAndDate(doctorId, date);
-        List<Map<String, String>> updatedTimeSlots = mapAvailabilityToTimeSlots(updatedAvailabilities);
-
-        // Return as a map with the date as key
-        return Map.of(dateStr, updatedTimeSlots);
-    }
     private List<Map<String, String>> mapAvailabilityToTimeSlots(List<DoctorAvailability> availabilities) {
         return availabilities.stream()
                 .map(a -> Map.of(

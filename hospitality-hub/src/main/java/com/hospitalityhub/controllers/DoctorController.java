@@ -31,12 +31,10 @@ public class DoctorController {
     public ResponseEntity<?> updateDoctorProfile(@RequestBody DoctorDto doctorDto, Principal principal) {
         String username = principal.getName();
         DoctorDto updatedDoctor = doctorService.updateDoctorProfile(username, doctorDto);
-
         Map<String, Object> response = new HashMap<>();
         response.put("data", updatedDoctor);
         response.put("message", "Profile updated successfully");
         response.put("status", true);
-
         return ResponseEntity.ok(response);
     }
 
